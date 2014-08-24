@@ -1,8 +1,13 @@
 # -*- coding: utf-8 -*-
+import base64
+import os
 
 from annotator import annotation, document
 from pyramid.i18n import TranslationStringFactory
 from pyramid.security import Allow, Authenticated, Everyone, ALL_PERMISSIONS
+from zope.interface import implementer
+
+from h.oauth import IClientClass
 
 _ = TranslationStringFactory(__package__)
 
@@ -195,3 +200,49 @@ class Annotation(annotation.Annotation):
 
 class Document(document.Document):
     pass
+
+
+@implementer(IClientClass)
+class Client(object):
+
+    """
+    A basic implementation of :class:`h.oauth.IClientClass`.
+
+    This implementation provides no persistence. It is provided for testing
+    and for deriving other implementations.
+    """
+
+    _client_id = None
+    _client_secret = None
+
+    def __init__(self, client_id, client_secret=None):
+        self._client_id = client_id
+
+        if client_secret is None:
+            self._client_secret = base64.urlsafe_b64encode(os.urandom(18))
+        else:
+            self._client_secret = client_secret
+
+    @property
+    def client_id(self):
+        return self._client_id
+
+    @property
+    def client_secret(self):
+        return self._client_secret
+
+    @classmethod
+    def fetch(cls, client_id):
+        return None
+
+
+def includeme(config):
+    registry = config.registry
+
+    models = [
+        (IClientClass, Client),
+    ]
+
+    for iface, imp in models:
+        if not registry.queryUtility(iface):
+            registry.registerUtility(imp, iface)
