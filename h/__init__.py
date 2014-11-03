@@ -12,6 +12,7 @@ del get_versions
 
 
 def includeme(config):
+    config.include('pyramid_exclog')
     config.include('pyramid_multiauth')
     config.include('h.api')
     config.include('h.models')

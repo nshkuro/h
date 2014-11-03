@@ -41,6 +41,7 @@ install_requires = [
     'jsonschema==1.3.0',
     'oauthlib==0.6.3',
     'pyramid>=1.5',
+    'pyramid_exclog>=0.6',
     'pyramid-basemodel>=0.2',
     'pyramid_chameleon>=0.1',
     'pyramid-layout>=0.9',
