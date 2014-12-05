@@ -240,7 +240,6 @@ class AsyncRegisterController(RegisterController):
 @view_config(attr='edit_profile', route_name='edit_profile')
 @view_config(attr='disable_user', route_name='disable_user')
 @view_config(attr='profile', route_name='profile')
-@view_config(attr='unsubscribe', route_name='unsubscribe')
 class ProfileController(horus.views.ProfileController):
     def edit_profile(self):
         request = self.request
@@ -350,8 +349,6 @@ def includeme(config):
     config.add_route('disable_user', '/disable/{user_id}',
                      factory=UserFactory,
                      traverse="/{user_id}")
-    config.add_route('unsubscribe', '/unsubscribe/{subscription_id}',
-                     traverse="/{subscription_id}")
 
     config.include('horus')
     config.scan(__name__)
