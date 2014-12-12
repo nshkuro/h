@@ -11,6 +11,9 @@ class AppController
   ) ->
     {plugins, host, providers} = annotator
 
+    $scope.auth = auth
+    isFirstRun = $location.search().hasOwnProperty('firstrun')
+
     applyUpdates = (action, data) ->
       """Update the application with new data from the websocket."""
       return unless data?.length
@@ -147,12 +150,12 @@ class AppController
 
     $scope.login = ->
       $scope.dialog.visible = true
-      auth.login().then(reset, oncancel)
+      identity.request(oncancel)
 
     $scope.logout = ->
       return unless drafts.discard()
       $scope.dialog.visible = false
-      auth.logout().then(reset)
+      identity.logout()
 
     $scope.loadMore = (number) ->
       unless streamfilter.getPastData().hits then return
@@ -181,10 +184,13 @@ class AppController
     $scope.sort = name: 'Location'
     $scope.threading = plugins.Threading
 
-    auth.getInitialUser().then(reset, ->
-      reset()
-      $scope.login()
-    )
+    $scope.$watch 'auth.user', (newVal, oldVal) ->
+      if newVal isnt undefined
+        reset()
+        return
+
+      if isFirstRun and newVal is null and oldVal is undefined
+        $scope.login()
 
 
 class AnnotationViewerController
