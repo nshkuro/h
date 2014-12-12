@@ -40,17 +40,14 @@ class AppController
     checkingToken = false
     isFirstRun = $location.search().hasOwnProperty('firstrun')
 
-    applyUpdates = (action, data) ->
-      """Update the application with new data from the websocket."""
-      return unless data?.length
-      if action == 'past'
-        action = 'create'
-
+    applyUpdates = (action, annotations) ->
       switch action
+        when 'past'
+          plugins.Store?._onLoadAnnotations annotations
         when 'create', 'update'
-          plugins.Store?._onLoadAnnotations data
+          plugins.Store?._onLoadAnnotations annotations
         when 'delete'
-          for annotation in data
+          for annotation in annotations
             annotation = plugins.Threading.idTable[annotation.id]?.message
             continue unless annotation?
             plugins.Store?.unregisterAnnotation(annotation)
@@ -59,14 +56,15 @@ class AppController
     streamer.onmessage = (msg) ->
       unless msg.data.type? and msg.data.type is 'annotation-notification'
         return
+
       data = msg.data.payload
       action = msg.data.options.action
 
-      unless data instanceof Array then data = [data]
+      if data.length == 0
+        return
 
       p = $scope.persona
       user = if p? then "acct:" + p.username + "@" + p.provider else ''
-      unless data instanceof Array then data = [data]
 
       if $scope.socialView.name is 'single-player'
         owndata = data.filter (d) -> d.user is user
