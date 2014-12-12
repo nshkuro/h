@@ -305,6 +305,13 @@ annotation = [
   '$document', 'annotator',
   ($document,   annotator) ->
     linkFn = (scope, elem, attrs, [ctrl, thread, threadFilter, counter]) ->
+      ann = scope.annotationGet()
+
+      scope.$watch (-> ann._source), (src) ->
+        if src == 'stream'
+          thread.flash()
+        delete ann._source
+
       # Helper function to remove the temporary thread created for a new reply.
       prune = (message) ->
         return if message.id?  # threading plugin will take care of it

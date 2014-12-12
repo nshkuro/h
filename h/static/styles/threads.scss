@@ -35,6 +35,10 @@ $threadexp-width: .6em;
     &:focus { outline: 0; }
   }
 
+  &.thread-flash {
+    background-color: #ffc;
+  }
+
   .thread {
     border-left: 1px dotted $gray-light;
     padding: 0;

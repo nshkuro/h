@@ -1,6 +1,7 @@
 ### global -COLLAPSED_CLASS ###
 
 COLLAPSED_CLASS = 'thread-collapsed'
+FLASH_CLASS = 'thread-flash'
 
 ###*
 # @ngdoc type
@@ -15,7 +16,8 @@ COLLAPSED_CLASS = 'thread-collapsed'
 # the collapsing behavior.
 ###
 ThreadController = [
-  ->
+  '$timeout',
+  ($timeout) ->
     @container = null
     @collapsed = false
 
@@ -37,6 +39,18 @@ ThreadController = [
     ###
     this.showReplyToggle = (messageCount) ->
       messageCount > 1 && !(@collapsed && @container.parent.parent)
+
+    ###*
+    # @ngdoc method
+    # @name thread.ThreadController#flash
+    # @description
+    # Flashes the current thread.
+    ###
+    this.flash = ->
+      @_flash = true
+      $timeout =>
+        @_flash = false
+      , 3000
 
     this
 ]
@@ -101,6 +115,12 @@ thread = [
       if attrs.threadCollapsed
         scope.$watch $parse(attrs.threadCollapsed), (collapsed) ->
           ctrl.toggleCollapsed() if !!collapsed != ctrl.collapsed
+
+      scope.$watch (-> ctrl._flash), (flash) ->
+        if flash
+          attrs.$addClass FLASH_CLASS
+        else
+          attrs.$removeClass FLASH_CLASS
 
     controller: 'ThreadController'
     controllerAs: 'vm'

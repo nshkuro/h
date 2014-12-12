@@ -45,6 +45,8 @@ class AppController
         when 'past'
           plugins.Store?._onLoadAnnotations annotations
         when 'create', 'update'
+          for annotation in annotations
+            annotation._source = 'stream'
           plugins.Store?._onLoadAnnotations annotations
         when 'delete'
           for annotation in annotations
