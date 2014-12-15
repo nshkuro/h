@@ -17,9 +17,6 @@ describe 'h', ->
 
     fakeAuth = {
       user: null
-      getInitialUser: ->
-        then: (resolve, reject) ->
-          resolve()
     }
 
     fakeIdentity = {
@@ -66,7 +63,8 @@ describe 'h', ->
         $controller('AppController', {$scope: $scope})
 
     it 'does not show login form for logged in users', ->
-      app = createController()
+      createController()
+      $scope.$digest()
       assert.isFalse($scope.dialog.visible)
 
   describe 'AnnotationViewerController', ->
