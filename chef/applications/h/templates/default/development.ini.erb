@@ -1,0 +1,99 @@
+[app:main]
+use: egg:h
+
+api.key: 00000000-0000-0000-0000-000000000000
+
+# Don't create/update indices and mappings by default. You will need to
+# uncomment this if running multiple web workers.
+#basemodel.should_create_all = False
+
+es.host: http://localhost:9200
+
+h.feature.api: True
+h.feature.streamer: True
+
+horus.allow_email_auth: True
+horus.autologin: True
+horus.require_activation: False
+
+horus.login_redirect: stream
+horus.logout_redirect: login
+horus.activate_redirect: stream
+
+multiauth.policies: h.auth.local h.api
+
+mail.default_sender: "Annotation Daemon" <no-reply@localhost>
+
+pyramid.debug_all: True
+pyramid.reload_templates: True
+pyramid.includes:
+    h.queue.local
+    pyramid_multiauth
+    pyramid_basemodel
+    pyramid_debugtoolbar
+    pyramid_mailer
+    pyramid_tm
+    h.testing
+
+sqlalchemy.url: sqlite:///h.db
+
+jinja2.extensions: h.jinja_extensions:IncludeRawExtension
+
+webassets.base_dir: h:static
+webassets.base_url: assets
+webassets.coffee_no_bare: True
+webassets.debug: True
+webassets.manifest: False
+webassets.static_view: True
+webassets.uglifyjs_bin: %(here)s/node_modules/.bin/uglifyjs
+webassets.cleancss_bin: %(here)s/node_modules/.bin/cleancss
+webassets.coffee_bin: %(here)s/node_modules/.bin/coffee
+
+;http://docs.pylonsproject.org/projects/pyramid-debugtoolbar/en/latest/#settings
+debugtoolbar.show_on_exc_only: True
+
+[server:main]
+use: egg:gunicorn
+port: 5000
+worker_class: gevent
+graceful_timeout: 0
+errorlog: -
+reload: True
+host: <%= @host =%>
+
+[loggers]
+keys = root, gunicorn.error, h
+
+
+[handlers]
+keys = console
+
+
+[formatters]
+keys = generic
+
+
+[logger_root]
+handlers = console
+
+
+[logger_gunicorn.error]
+level = INFO
+handlers =
+qualname = gunicorn.error
+
+
+[logger_h]
+level = DEBUG
+handlers =
+qualname = h
+
+
+[handler_console]
+class = StreamHandler
+args = ()
+formatter = generic
+
+
+[formatter_generic]
+format = %(asctime)s [%(process)d] [%(name)s:%(levelname)s] %(message)s
