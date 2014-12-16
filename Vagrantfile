@@ -4,11 +4,15 @@ Vagrant.configure("2") do |config|
   config.vm.network "forwarded_port", guest: 5000, host: 5000
 
   config.vm.define "h" do |machine|      
+
+    machine.vm.synced_folder ".", "/h"
+
     machine.vm.provision :chef_solo do |chef|
       chef.cookbooks_path = ["cookbooks", "chef/applications"]
       chef.roles_path = "chef/roles"
       chef.add_role "h"      
     end
+
   end
 
   config.vm.provider :virtualbox do |vb, override|

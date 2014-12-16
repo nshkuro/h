@@ -12,12 +12,6 @@ bash "restart elasticsearch" do
   EOL
 end
 
-bash "chmod" do
-  code <<-EOL  
-  chmod -R 777 /h
-  EOL
-end
-
 template "development.ini" do
   source "development.ini.erb"
   mode 0644
